@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import mongoose from "mongoose";
-import { PORT,MONGODB_URL } from "./config.js";
+import { PORT,MONGODB_URL,JWT_SECRET } from "./config.js";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -80,7 +80,7 @@ app.post("/login",async (req, res) => {
   if(!isMatch) {
     return res.render("login",{email,message:"Incorrect password"});
   }
-  const token = jwt.sign({_id:user._id},"aedfp9a8er9hap0aw9iejr");
+  const token = jwt.sign({_id:user._id},JWT_SECRET);
   console.log(token);
   res.cookie("token",token,{
     httpOnly:true,
@@ -101,7 +101,7 @@ app.post("/register", async (req, res) => {
   const hashedPassword = await bcrypt.hash(password,10);
   user = await User.create({name,email,password:hashedPassword});
 
-  const token = jwt.sign({_id:user._id},"aedfp9a8er9hap0aw9iejr");
+  const token = jwt.sign({_id:user._id},JWT_SECRET);
   console.log(token);
   res.cookie("token",token,{
     httpOnly:true,
